@@ -17,7 +17,15 @@ class StudentFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => $this->faker->name,
+            'email' => $this->faker->unique()->safeEmail,
+            'phone' => $this->faker->phoneNumber,
+            'address' => $this->faker->address,
+            'boarding_point' => $this->faker->address,
+            'drop_off_point' => $this->faker->address,
+            'password' => $this->faker->password,
+            // override the bus_id to be a random bus id if not provided
+            'bus_id' => \App\Models\Bus::factory(),
         ];
     }
 }
