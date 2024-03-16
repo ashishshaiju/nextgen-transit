@@ -40,6 +40,34 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        // guard for admin
+        'admin' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
+        // guard for staff
+        'staff' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
+
+        // guard for parent
+        'parent' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
+
+        // guard for driver
+        'driver' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
+
+        // guard for student
+        'student' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
     ],
 
     /*
