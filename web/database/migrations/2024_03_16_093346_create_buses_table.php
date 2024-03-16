@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->integer('bus_no');
             $table->string('name');
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->string('destination');
-            $table->json('boarding_points');
+            $table->json('boarding_points')->nullable();
             $table->timestamps();
         });
     }
