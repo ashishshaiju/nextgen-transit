@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('buses', function (Blueprint $table) {
             $table->id();
+            $table->integer('bus_no');
+            $table->string('name');
+            $table->text('description');
+            $table->string('destination');
+            $table->json('boarding_points');
             $table->timestamps();
         });
     }
