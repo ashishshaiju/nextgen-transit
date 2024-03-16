@@ -21,47 +21,46 @@ class RolesAndPermissionsSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Roles for the application
-        $studentRole = Role::create(['name' => 'Student']);
-        $adminRole = Role::create(['name' => 'Admin']);
-        $staffRole = Role::create(['name' => 'Staff']);
-        $parentRole = Role::create(['name' => 'Parent']);
-        $driverRole = Role::create(['name' => 'Driver']);
+        $studentRole = Role::create(['name' => 'Student', 'guard_name' => 'web']);
+        $adminRole = Role::create(['name' => 'Admin', 'guard_name' => 'admin']);
+        $staffRole = Role::create(['name' => 'Staff', 'guard_name' => 'staff']);
+        $parentRole = Role::create(['name' => 'Parent', 'guard_name' => 'parent']);
+        $driverRole = Role::create(['name' => 'Driver', 'guard_name' => 'driver']);
 
         // create permissions for buses
-        Permission::create(['name' => 'create-bus']);
-        Permission::create(['name' => 'edit-bus']);
-        Permission::create(['name' => 'delete-bus']);
+        Permission::create(['name' => 'create-bus', 'guard_name' => 'admin']);
+        Permission::create(['name' => 'edit-bus', 'guard_name' => 'admin']);
+        Permission::create(['name' => 'delete-bus', 'guard_name' => 'admin']);
 
         //create permissions for semesters
-        Permission::create(['name' => 'create-semester']);
-        Permission::create(['name' => 'edit-semester']);
-        Permission::create(['name' => 'delete-semester']);
+        Permission::create(['name' => 'create-semester', 'guard_name' => 'admin']);
+        Permission::create(['name' => 'edit-semester', 'guard_name' => 'admin']);
+        Permission::create(['name' => 'delete-semester', 'guard_name' => 'admin']);
 
         // create permissions for students
-        Permission::create(['name' => 'create-student']);
-        Permission::create(['name' => 'edit-student']);
-        Permission::create(['name' => 'delete-student']);
+        Permission::create(['name' => 'create-student', 'guard_name' => 'admin']);
+        Permission::create(['name' => 'edit-student', 'guard_name' => 'admin']);
+        Permission::create(['name' => 'delete-student', 'guard_name' => 'admin']);
 
         // create permissions for staff
-        Permission::create(['name' => 'create-staff']);
-        Permission::create(['name' => 'edit-staff']);
-        Permission::create(['name' => 'delete-staff']);
+        Permission::create(['name' => 'create-staff', 'guard_name' => 'admin']);
+        Permission::create(['name' => 'edit-staff', 'guard_name' => 'admin']);
+        Permission::create(['name' => 'delete-staff', 'guard_name' => 'admin']);
 
         // create permissions for parents
-        Permission::create(['name' => 'create-parent']);
-        Permission::create(['name' => 'edit-parent']);
-        Permission::create(['name' => 'delete-parent']);
+        Permission::create(['name' => 'create-parent', 'guard_name' => 'admin']);
+        Permission::create(['name' => 'edit-parent', 'guard_name' => 'admin']);
+        Permission::create(['name' => 'delete-parent', 'guard_name' => 'admin']);
 
         // create permissions for drivers
-        Permission::create(['name' => 'create-driver']);
-        Permission::create(['name' => 'edit-driver']);
-        Permission::create(['name' => 'delete-driver']);
+        Permission::create(['name' => 'create-driver', 'guard_name' => 'admin']);
+        Permission::create(['name' => 'edit-driver', 'guard_name' => 'admin']);
+        Permission::create(['name' => 'delete-driver', 'guard_name' => 'admin']);
 
 
         // Assign permissions to roles
         $studentRole->givePermissionTo([
             // give your student permissions here
-            'edit-student',
         ]);
 
         $adminRole->givePermissionTo([
@@ -88,17 +87,14 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $staffRole->givePermissionTo([
             // give your staff permissions here
-            'edit-staff',
         ]);
 
         $parentRole->givePermissionTo([
             // give your parent permissions here
-            'edit-parent',
         ]);
 
         $driverRole->givePermissionTo([
             // give your driver permissions here
-            'edit-driver',
         ]);
 
 

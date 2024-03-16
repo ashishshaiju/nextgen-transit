@@ -22,6 +22,14 @@ class User extends Authenticatable
     use HasRoles;
     use HasPermissions;
 
+
+    /**
+     * Set the default guard for the model.
+     *
+     * @var string
+     */
+    protected $guard_name = 'admin';
+
     /**
      * The attributes that are mass assignable.
      *
