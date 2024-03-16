@@ -96,7 +96,5 @@ class RolesAndPermissionsSeeder extends Seeder
         $driverRole->givePermissionTo([
             // give your driver permissions here
         ]);
-
-
     }
 }
