@@ -20,41 +20,87 @@ class RolesAndPermissionsSeeder extends Seeder
         // reset cached roles and permissions
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // create permissions for your applications
-        Permission::create(['name' => 'create-amenities']);
-        Permission::create(['name' => 'edit-amenities']);
-        Permission::create(['name' => 'delete-amenities']);
-
-        // permissions for admin to manage users
-        Permission::create(['name' => 'promote-to-premium']);
-        Permission::create(['name' => 'demote-to-user']);
-
-        // permission which is only assigned to upgraded users
-        Permission::create(['name' => 'is-upgraded']);
-
-        $userRole = Role::create(['name' => 'User']);
-        $premiumRole = Role::create(['name' => 'Premium']);
+        // Roles for the application
+        $studentRole = Role::create(['name' => 'Student']);
         $adminRole = Role::create(['name' => 'Admin']);
+        $staffRole = Role::create(['name' => 'Staff']);
+        $parentRole = Role::create(['name' => 'Parent']);
+        $driverRole = Role::create(['name' => 'Driver']);
 
-        $userRole->givePermissionTo([
-            // give your permissions here
-        ]);
+        // create permissions for buses
+        Permission::create(['name' => 'create-bus']);
+        Permission::create(['name' => 'edit-bus']);
+        Permission::create(['name' => 'delete-bus']);
 
-        $userRole->givePermissionTo([
-            'is-upgraded'
-        ]);
+        //create permissions for semesters
+        Permission::create(['name' => 'create-semester']);
+        Permission::create(['name' => 'edit-semester']);
+        Permission::create(['name' => 'delete-semester']);
 
-        $premiumRole->givePermissionTo([
-            // give your premium permissions here
+        // create permissions for students
+        Permission::create(['name' => 'create-student']);
+        Permission::create(['name' => 'edit-student']);
+        Permission::create(['name' => 'delete-student']);
+
+        // create permissions for staff
+        Permission::create(['name' => 'create-staff']);
+        Permission::create(['name' => 'edit-staff']);
+        Permission::create(['name' => 'delete-staff']);
+
+        // create permissions for parents
+        Permission::create(['name' => 'create-parent']);
+        Permission::create(['name' => 'edit-parent']);
+        Permission::create(['name' => 'delete-parent']);
+
+        // create permissions for drivers
+        Permission::create(['name' => 'create-driver']);
+        Permission::create(['name' => 'edit-driver']);
+        Permission::create(['name' => 'delete-driver']);
+
+
+        // Assign permissions to roles
+        $studentRole->givePermissionTo([
+            // give your student permissions here
+            'edit-student',
         ]);
 
         $adminRole->givePermissionTo([
             // give your admin permissions here
-            'create-amenities',
-            'edit-amenities',
-            'delete-amenities',
-            'promote-to-premium',
-            'demote-to-user',
+            'create-bus',
+            'edit-bus',
+            'delete-bus',
+            'create-semester',
+            'edit-semester',
+            'delete-semester',
+            'create-student',
+            'edit-student',
+            'delete-student',
+            'create-staff',
+            'edit-staff',
+            'delete-staff',
+            'create-parent',
+            'edit-parent',
+            'delete-parent',
+            'create-driver',
+            'edit-driver',
+            'delete-driver',
         ]);
+
+        $staffRole->givePermissionTo([
+            // give your staff permissions here
+            'edit-staff',
+        ]);
+
+        $parentRole->givePermissionTo([
+            // give your parent permissions here
+            'edit-parent',
+        ]);
+
+        $driverRole->givePermissionTo([
+            // give your driver permissions here
+            'edit-driver',
+        ]);
+
+
     }
 }
