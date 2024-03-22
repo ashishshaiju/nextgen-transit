@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('place');
             $table->string('distance_from_college');
-            $table->string('time_to_reach');
             $table->timestamps();
         });
     }

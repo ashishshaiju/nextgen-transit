@@ -13,7 +13,6 @@ class BoardingPoint extends Model
     protected $fillable = [
         'place',
         'distance_from_college',
-        'time_to_reach',
     ];
 
     public function buses(): BelongsToMany

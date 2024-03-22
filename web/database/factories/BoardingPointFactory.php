@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\BoardingPoint;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\BoardingPoint>
+ * @extends Factory<BoardingPoint>
  */
 class BoardingPointFactory extends Factory
 {
@@ -17,7 +18,8 @@ class BoardingPointFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'place' => $this->faker->randomElements(['Changanachery', 'Kumaranelloor', 'Karukachal', 'Kottayam', 'Vaikam', 'Thalayollaparambu'], 1),
+            'distance_from_college' => $this->faker->numberBetween(1, 100),
         ];
     }
 }
