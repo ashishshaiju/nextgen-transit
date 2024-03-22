@@ -19,9 +19,4 @@ class Student extends Model
     {
         return $this->belongsTo(User::class);
     }
-
-    public function busBoardingPoint(): BelongsTo
-    {
-        return $this->belongsTo(BusBoardingPoint::class);
-    }
 }

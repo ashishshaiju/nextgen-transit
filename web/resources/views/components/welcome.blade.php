@@ -19,7 +19,7 @@
 
     @if (Auth::user()->hasRole('student'))
         <p class="mt-4 text-gray-500">
-            You are assigned to bus: {{ Auth::user()->bus->bus_number }}
+            You are assigned to bus: {{ Auth::user()->busBoardingPoint->bus->bus_number }}
         </p>
     @endif
 

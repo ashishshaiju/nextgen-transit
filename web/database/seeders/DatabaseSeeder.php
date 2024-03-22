@@ -41,11 +41,23 @@ class DatabaseSeeder extends Seeder
          // assign the role of student to the user
         $student->user->assignRole('student');
 
-        // assign a bus boarding point to the student with morning and evening times
-        $student->busBoardingPoint()->associate(\App\Models\BusBoardingPoint::factory()->create([
-            'bus_id' => \App\Models\Bus::all()->random()->id,
-            'boarding_point_id' => \App\Models\BoardingPoint::all()->random()->id,
-        ]));
+        // Get a random bus
+        $bus = \App\Models\Bus::inRandomOrder()->first();
+
+        // Get a random boarding point
+        $boardingPoint = \App\Models\BoardingPoint::inRandomOrder()->first();
+
+        // Create a new bus boarding point
+        $busBoardingPoint = $student->user->busBoardingPoint()->create([
+            'bus_id' => $bus->id,
+            'boarding_point_id' => $boardingPoint->id,
+            'morning_reach_time' => '07:00:00',
+            'evening_reach_time' => '17:00:00',
+        ]);
+
+        // Update the bus_boarding_point_id in the users table
+        $student->user->bus_boarding_point_id = $busBoardingPoint->id;
+        $student->user->save();
 
         \App\Models\Student::factory(2)->create();
     }
