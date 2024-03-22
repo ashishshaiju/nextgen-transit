@@ -12,13 +12,30 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\Student::factory(2)->create();
-
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@examplec.com',
-        // ]);
-
+        // Seed the roles and permissions
         $this->call(RolesAndPermissionsSeeder::class);
+
+        // Seed the buses
+        \App\Models\Bus::factory(5)->create();
+
+        // Seed the semesters
+        \App\Models\Semester::factory(5)->create();
+
+        // Seed the students
+         $student = \App\Models\Student::factory()->create([
+            'boarding_point' => 'Kathmand',
+            'drop_off_point' => 'Pokhara',
+             'user_id' => \App\Models\User::factory()->create([
+                 'name' => 'John Doe',
+                 'email' => 'student1@gmail.com',
+                 'password' => bcrypt('password'),
+                ])->id,
+         ]);
+
+         // assign the role of student to the user
+        $student->user->assignRole('student');
+
+        \App\Models\Student::factory(2)->create();
     }
+
 }

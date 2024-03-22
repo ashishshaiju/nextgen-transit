@@ -25,7 +25,7 @@ class BusFactory extends Factory
             'description' => $this->faker->text,
             'destination' => $this->faker->city,
             // boarding_points random array of 5 cities into json format
-            'boarding_points' => json_encode($this->faker->randomElements(['Kathmandu', 'Pokhara', 'Chitwan', 'Biratnagar', 'Butwal'], 5)),
+            'boarding_points' => json_encode($this->faker->randomElements(['Changanachery', 'Kumaranelloor', 'Karukachal', 'Kottayam', 'Vaikam', 'Thalayollaparambu'], 6)),
         ];
     }
 }
