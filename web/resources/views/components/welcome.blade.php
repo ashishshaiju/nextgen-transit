@@ -17,6 +17,13 @@
     </p>
 
 
+    @if (Auth::user()->hasRole('student'))
+        <p class="mt-4 text-gray-500">
+            You are assigned to bus: {{ Auth::user()->bus->bus_number }}
+        </p>
+    @endif
+
+
 </div>
 
 {{--<div class="bg-gray-200 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8">--}}

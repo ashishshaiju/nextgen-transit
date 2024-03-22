@@ -14,15 +14,9 @@ class BusBoardingPointSeeder extends Seeder
     public function run(): void
     {
         // attach boarding points to buses with morning and evening times
+        $buses = \App\Models\Bus::all();
         $boardingPoints = BoardingPoint::all();
-        \App\Models\Bus::all()->each(function ($bus) use ($boardingPoints) {
-            $bus->boardingPoints()->attach(
-                $boardingPoints->random(rand(1, 3))->pluck('id')->toArray(),
-                [
-                    'morning_reach_time' => now()->addHours(rand(6, 8))->format('H:i:s'),
-                    'evening_reach_time' => now()->addHours(rand(16, 18))->format('H:i:s'),
-                ]
-            );
-        });
+
+
     }
 }

@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // these columns are added to the users table
-
+            // add bus boarding point relationship to the users table
+            $table->foreignId('bus_boarding_point_id')->nullable()->constrained();
         });
     }
 
@@ -23,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-
+            $table->dropConstrainedForeignId('bus_boarding_point_id');
         });
     }
 };

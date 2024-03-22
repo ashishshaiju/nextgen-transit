@@ -17,6 +17,6 @@ class BoardingPoint extends Model
 
     public function buses(): BelongsToMany
     {
-        return $this->belongsToMany(Bus::class);
+        return $this->belongsToMany(Bus::class, 'bus_boarding_points');
     }
 }
