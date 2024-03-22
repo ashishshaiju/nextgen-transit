@@ -18,6 +18,12 @@ class DatabaseSeeder extends Seeder
         // Seed the buses
         \App\Models\Bus::factory(5)->create();
 
+        // Seed the boarding points
+        $this->call(BoardingPointSeeder::class);
+
+        // Attach boarding points to buses
+        $this->call(BusBoardingPointSeeder::class);
+
         // Seed the semesters
         \App\Models\Semester::factory(5)->create();
 

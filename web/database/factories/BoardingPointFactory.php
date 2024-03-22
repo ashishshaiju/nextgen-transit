@@ -18,7 +18,7 @@ class BoardingPointFactory extends Factory
     public function definition(): array
     {
         return [
-            'place' => $this->faker->randomElements(['Changanachery', 'Kumaranelloor', 'Karukachal', 'Kottayam', 'Vaikam', 'Thalayollaparambu'], 1),
+            'place' => $this->faker->randomElement(['Changanachery', 'Kumaranelloor', 'Karukachal', 'Kottayam', 'Vaikam', 'Thalayollaparambu']),
             'distance_from_college' => $this->faker->numberBetween(1, 100),
         ];
     }

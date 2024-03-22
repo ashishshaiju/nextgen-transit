@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('boarding_points', function (Blueprint $table) {
             $table->id();
             $table->string('place');
-            $table->string('distance_from_college');
+            $table->float('distance_from_college');
             $table->timestamps();
         });
     }
