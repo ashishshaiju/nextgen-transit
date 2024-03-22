@@ -16,6 +16,9 @@ return new class extends Migration
             $table->string("code");
             $table->string("name");
             $table->integer("year");
+            $table->date("start_date");
+            $table->date("end_date");
+            $table->boolean("is_active")->default(false);
             $table->timestamps();
         });
     }
