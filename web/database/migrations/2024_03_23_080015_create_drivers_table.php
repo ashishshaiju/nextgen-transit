@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('drivers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('license_number')->unique();
+            $table->string('license_expiry_date');
+            $table->string('license_image');
+            $table->foreignId('bus_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
