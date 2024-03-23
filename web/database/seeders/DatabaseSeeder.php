@@ -59,6 +59,20 @@ class DatabaseSeeder extends Seeder
         $student->user->bus_boarding_point_id = $busBoardingPoint->id;
         $student->user->save();
 
+        // Seed the staff
+        $staff = \App\Models\Staff::factory()->create([
+            'department' => 'CSE',
+            'designation' => 'Teacher',
+            'user_id' => \App\Models\User::factory()->create([
+                'name' => 'Jane Doe',
+                'email' => 'staff1@gmail.com',
+                'password' => bcrypt('password'),
+            ])->id,
+        ]);
+
+        // assign the role of staff to the user
+        $staff->user->assignRole('staff');
+
         \App\Models\Student::factory(2)->create();
     }
 
