@@ -94,6 +94,23 @@ class DatabaseSeeder extends Seeder
             'relationship' => 'Father',
         ]);
 
+        // seed driver
+        $driver = \App\Models\Driver::factory()->create([
+            'license_number' => '123456789',
+            'user_id' => \App\Models\User::factory()->create([
+                'name' => 'Veerapan',
+                'email' => 'driver1@gmail.com',
+                'password' => bcrypt('password'),
+            ])->id,
+        ]);
+
+        // assign the role of driver to the user
+        $driver->user->assignRole('driver');
+
+        // assign the bus to the driver
+        $driver->bus_id = $bus->id;
+        $driver->save();
+
         \App\Models\Student::factory(2)->create();
     }
 
