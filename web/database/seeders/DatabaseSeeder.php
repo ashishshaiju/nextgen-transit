@@ -111,6 +111,20 @@ class DatabaseSeeder extends Seeder
         $driver->bus_id = $bus->id;
         $driver->save();
 
+
+        // Seed admin
+        $admin = \App\Models\Admin::factory()->create([
+            'user_id' => \App\Models\User::factory()->create([
+                'name' => 'Administrator',
+                'email' => 'admin@gmail.com',
+                'password' => bcrypt('password'),
+            ])->id,
+        ]);
+
+        // assign the role of admin to the user
+        $admin->user->assignRole('admin');
+
+
         \App\Models\Student::factory(2)->create();
     }
 

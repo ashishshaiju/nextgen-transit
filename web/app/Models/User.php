@@ -87,4 +87,14 @@ class User extends Authenticatable
     {
         return $this->hasOne(Guardian::class);
     }
+
+    public function driver(): HasOne
+    {
+        return $this->hasOne(Driver::class);
+    }
+
+    public function admin(): HasOne
+    {
+        return $this->hasOne(Admin::class);
+    }
 }
