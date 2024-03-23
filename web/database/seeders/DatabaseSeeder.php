@@ -73,6 +73,27 @@ class DatabaseSeeder extends Seeder
         // assign the role of staff to the user
         $staff->user->assignRole('staff');
 
+
+        // Seed the guardians
+        $guardian = \App\Models\Guardian::factory()->create([
+            'occupation' => 'Business',
+            'user_id' => \App\Models\User::factory()->create([
+                'name' => 'Guardian Doe',
+                'email' => 'guardian1@gmail.com',
+                'password' => bcrypt('password'),
+            ])->id,
+        ]);
+
+        // assign the role of guardian to the user
+        $guardian->user->assignRole('parent');
+
+        // Seed the guardian_student
+        \App\Models\GuardianStudent::factory()->create([
+            'guardian_id' => $guardian->id,
+            'student_id' => $student->id,
+            'relationship' => 'Father',
+        ]);
+
         \App\Models\Student::factory(2)->create();
     }
 

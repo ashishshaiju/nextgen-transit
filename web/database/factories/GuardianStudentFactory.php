@@ -1,5 +1,4 @@
 <?php
-
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -7,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Guardian>
  */
-class GuardianFactory extends Factory
+class GuardianStudentFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -17,7 +16,9 @@ class GuardianFactory extends Factory
     public function definition(): array
     {
         return [
-            'occupation' => $this->faker->randomElement(['Doctor', 'Engineer', 'Teacher', 'Businessman', 'Farmer', 'Lawyer', 'Politician', 'Artist', 'Musician', 'Athlete']),
+            'guardian_id' => \App\Models\Guardian::factory(),
+            'student_id' => \App\Models\Student::factory(),
+            'relationship' => $this->faker->randomElement(['Father', 'Mother', 'Uncle', 'Aunt', 'Grandfather', 'Grandmother', 'Brother', 'Sister', 'Cousin', 'Guardian']),
         ];
     }
 }
