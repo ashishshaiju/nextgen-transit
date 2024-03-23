@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('guardian_students', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('guardian_id')->constrained();
+            $table->foreignId('student_id')->constrained();
+            $table->string('relationship');
             $table->timestamps();
         });
     }

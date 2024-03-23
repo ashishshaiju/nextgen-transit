@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('guardians', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
-            $table->string('relationship');
             $table->string('occupation');
             $table->timestamps();
         });
