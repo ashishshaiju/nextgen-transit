@@ -67,39 +67,36 @@ class BusController extends Controller
                 $assignerMode->save();
 
                 // return the response to the cbms machine
-                return response()->json(['message' => 'Card assigned successfully'], 200);
-
-            } else {
-
-                return response()->json(['message' => 'Assigner mode is on'], 400);
+                return response()->json(['message' => 'Card assigned successfully'], 201);
             }
         }
 
+        // if not, system is in validation mode.
 
-        //check if the card exists for a user which is linked from students model
+        // check if the card exists for a user which is linked from students model
         // retrieve the student who is using the card
         $user = User::where('card_token', $cardToken)->first();
-        $student = $user->student;
+
+        // check if the user exists
         if (!$user) {
             return response()->json(['message' => 'Card not found'], 404);
         }
 
+        $student = $user->student;
+
         // check if the bus is assigned to the student who is using the card
-        if ($student->bus_id !== $busId) {
+        if ($user->bus_boarding_point_id != $busId) {
             return response()->json(['message' => 'Card not assigned to the bus'], 400);
         }
 
-        // if not, system is in validation mode. check if gthe card exists
-
-        // check if the card is assigned to the student
-
-        // check if the bus is assigned to the student
-
         // check the fee status of the student
+        // TODO: check the fee status of the student
 
         // record the activity
+        // TODO: record the activity
 
         // return the response to the cbms machine
+        return response()->json(['message' => 'Card validated successfully'], 200);
     }
 
 
