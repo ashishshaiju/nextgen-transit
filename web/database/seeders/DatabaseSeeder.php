@@ -15,6 +15,9 @@ class DatabaseSeeder extends Seeder
         // Seed the roles and permissions
         $this->call(RolesAndPermissionsSeeder::class);
 
+        // Seed the settings
+        $this->call(SettingsSeeder::class);
+
         // Seed the buses
         \App\Models\Bus::factory(5)->create();
 

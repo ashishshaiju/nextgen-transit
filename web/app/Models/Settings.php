@@ -12,17 +12,35 @@ class Settings extends Model
     protected $fillable = [
         'key',
         'value',
+        'is_json',
+        'type',
+        'description',
+        'is_active',
+        'is_required',
     ];
 
-    public static function set($key, $value, $is_json = false)
+    // modified set method to include type, description, is_active, is_required
+    public static function set($type, $key, $value, $is_json = false, $description = null, $is_active = true, $is_required = true)
     {
         $setting = self::where('key', $key)->first();
         if ($setting) {
             $setting->value = $value;
             $setting->is_json = $is_json;
+            $setting->type = $type;
+            $setting->description = $description;
+            $setting->is_active = $is_active;
+            $setting->is_required = $is_required;
             $setting->save();
         } else {
-            self::create(['key' => $key, 'value' => $value, 'is_json' => $is_json]);
+            self::create([
+                'key' => $key,
+                'value' => $value,
+                'is_json' => $is_json,
+                'type' => $type,
+                'description' => $description,
+                'is_active' => $is_active,
+                'is_required' => $is_required,
+            ]);
         }
     }
 
