@@ -8,6 +8,18 @@ use App\Http\Requests\UpdateBusRequest;
 
 class BusController extends Controller
 {
+
+    /**
+     * The endpoint where all the cbms machines will communicate with the server
+     *
+     */
+    public function core()
+    {
+        //
+    }
+
+
+
     /**
      * Display a listing of the resource.
      */
