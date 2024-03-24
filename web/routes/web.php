@@ -23,6 +23,9 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::get('/dashboard', function () {
+
+        // TODO: show system status if in validation mode or assigner mode.
+
         return view('dashboard');
     })->name('dashboard');
 });
