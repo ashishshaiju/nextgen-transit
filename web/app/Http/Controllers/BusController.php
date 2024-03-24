@@ -15,7 +15,28 @@ class BusController extends Controller
      */
     public function core()
     {
-        //
+        // check if the request has the required parameters
+        if (!request()->has('bus_id') || !request()->has('card_id')) {
+            return response()->json(['message' => 'Invalid request'], 400);
+        }
+
+        // check if the bus exists
+
+        // check if the system is in assigner mode
+
+        // if the system is in assigner mode, assign the card to the student who is mentioned in the assigner mode json object
+
+        // if not, system is in validation mode. check if gthe card exists
+
+        // check if the card is assigned to the student
+
+        // check if the bus is assigned to the student
+
+        // check the fee status of the student
+
+        // record the activity
+
+        // return the response to the cbms machine
     }
 
 
