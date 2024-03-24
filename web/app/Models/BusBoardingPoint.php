@@ -16,6 +16,8 @@ class BusBoardingPoint extends Model
     protected $fillable = [
         'bus_id',
         'boarding_point_id',
+        'morning_reach_time',
+        'evening_reach_time',
     ];
 
     public function bus()

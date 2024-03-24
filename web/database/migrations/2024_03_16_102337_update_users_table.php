@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             // add bus boarding point relationship to the users table
             $table->foreignId('bus_boarding_point_id')->nullable()->constrained();
+            $table->string('card_token')->nullable()->after('bus_boarding_point_id');
         });
     }
 
