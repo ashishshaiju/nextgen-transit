@@ -85,7 +85,7 @@ class BusController extends Controller
         $student = $user->student;
 
         // check if the bus is assigned to the student who is using the card
-        if ($user->bus_boarding_point_id != $busId) {
+        if ($user->busBoardingPoint->bus_id != $busId) {
             return response()->json(['message' => 'Card not assigned to the bus'], 400);
         }
 
