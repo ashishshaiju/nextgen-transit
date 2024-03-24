@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
+            $table->string('key');
+            $table->text('value');
+            $table->string('type');
+            $table->string('description')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->boolean('is_required')->default(true);
+            $table->boolean('is_json')->default(false);
             $table->timestamps();
         });
     }
