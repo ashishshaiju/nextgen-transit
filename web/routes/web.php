@@ -29,3 +29,14 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 });
+
+
+Route::middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+])->group(function () {
+    Route::get('/admin', function () {
+        return view('roles.admin.manage-bus');
+    })->name('admin.manage-bus');
+});
