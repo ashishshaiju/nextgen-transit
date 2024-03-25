@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('student_semesters', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('student_id')->constrained();
+            $table->foreignId('semester_id')->constrained();
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->boolean('is_current')->default(false);
             $table->timestamps();
         });
     }
