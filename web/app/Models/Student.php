@@ -31,4 +31,14 @@ class Student extends Model
     {
         return $this->hasMany(GuardianStudent::class);
     }
+
+    public function studentSemesters(): HasMany
+    {
+        return $this->hasMany(StudentSemester::class);
+    }
+
+    public function currentSemester(): BelongsTo
+    {
+        return $this->belongsTo(StudentSemester::class)->where('is_current', true)->first();
+    }
 }

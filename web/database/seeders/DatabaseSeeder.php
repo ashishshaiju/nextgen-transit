@@ -62,6 +62,26 @@ class DatabaseSeeder extends Seeder
         $student->user->bus_boarding_point_id = $busBoardingPoint->id;
         $student->user->save();
 
+        // seed the semester for the student
+        \App\Models\StudentSemester::factory()->create([
+            'student_id' => $student->id,
+            'semester_id' => \App\Models\Semester::inRandomOrder()->first()->id,
+            'start_date' => now()->subMonths(6),
+            'end_date' => now()->addMonths(6),
+            'status' => 'inactive',
+            'is_current' => false,
+        ]);
+
+        // seed the current semester for the student
+        \App\Models\StudentSemester::factory()->create([
+            'student_id' => $student->id,
+            'semester_id' => \App\Models\Semester::inRandomOrder()->first()->id,
+            'start_date' => now(),
+            'end_date' => now()->addMonths(6),
+            'status' => 'active',
+            'is_current' => true,
+        ]);
+
         // Seed the staff
         $staff = \App\Models\Staff::factory()->create([
             'department' => 'CSE',

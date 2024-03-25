@@ -83,9 +83,9 @@ class User extends Authenticatable
         return $this->hasOne(Staff::class);
     }
 
-    public function guardian(): HasOne
+    public function guardians(): BelongsToMany
     {
-        return $this->hasOne(Guardian::class);
+        return $this->belongsToMany(Guardian::class, 'guardian_students', 'student_id', 'guardian_id')->withPivot('relationship');
     }
 
     public function driver(): HasOne

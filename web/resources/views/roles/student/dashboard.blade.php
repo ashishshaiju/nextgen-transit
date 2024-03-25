@@ -123,7 +123,7 @@
     class="grid grid-cols-12 gap-4"
 >
     {{-- Start --}}
-    <div class="col-span-12 lg:col-span-8 xl:col-span-8">
+    <div class="col-span-12 lg:col-span-4 xl:col-span-4">
         <!-- component -->
         <div class="p-4 mx-4 w-full mx-auto pt-20 flow-root">
             <ul role="list" class="-mb-8">
@@ -241,10 +241,38 @@
     </div>
     {{-- End --}}
 
+    {{-- Parents Column --}}
     {{-- Start --}}
-    <div
-        class="mt-4 col-span-12 lg:col-span-8 xl:col-span-4 mx-auto"
-    >
+    <div class="pt-12 lg:mt-0 col-span-12 lg:col-span-4 xl:col-span-4">
+        <div class="px-6 text-xl text-center font-semibold text-gray-600 mb-8">
+            Parents
+        </div>
+    @foreach (Auth::user()->guardians as $parent)
+        <!-- Card -->
+        <a class="group flex flex-col bg-white border shadow-sm rounded-xl hover:shadow-md transition" href="#">
+            <div class="px-4 py-3 ">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center">
+                        <img class="size-[38px] rounded-full" src="{{ $parent->user->profile_photo_url }}" alt="Image Description">
+                        <div class="ms-3">
+                            <h3 class="group-hover:text-blue-600 font-semibold text-gray-700">
+                                {{ $parent->user->name }}
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="ps-3">
+                        <svg class="flex-shrink-0 size-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                    </div>
+                </div>
+            </div>
+        </a>
+        <!-- End Card -->
+    @endforeach
+    </div>
+    {{-- Stop --}}
+
+    {{-- Start --}}
+    <div class="mt-4 col-span-12 lg:col-span-4 xl:col-span-4 mx-auto">
         <div class="text-xl text-center font-semibold text-gray-600 mb-8">
             Bus Pass Details
         </div>
@@ -277,7 +305,7 @@
             </div>
         </div>
         <div
-            class="swiper h-40 w-64 mx-auto justify-center mt-4"
+            class="swiper h-40 w-64 mx-auto justify-center my-4"
         >
             <div class="swiper-wrapper">
                 <div
