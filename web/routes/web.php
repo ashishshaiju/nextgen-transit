@@ -36,7 +36,7 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/admin', function () {
+    Route::get('/buses', function () {
         return view('roles.admin.manage-bus');
     })->name('admin.manage-bus');
 });
