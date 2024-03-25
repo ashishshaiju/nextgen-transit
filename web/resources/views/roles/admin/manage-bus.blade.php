@@ -24,7 +24,7 @@
                                                 College Buses
                                             </h2>
                                             <p class="text-sm text-gray-600">
-                                                Keys you have generated to connect with third-party clients or access the <a class="inline-flex items-center gap-x-1.5 text-blue-600 decoration-2 hover:underline font-medium" href="#">Preline API.</a>
+                                                Keys you have generated to connect with third-party clients or access the API.
                                             </p>
                                         </div>
 
