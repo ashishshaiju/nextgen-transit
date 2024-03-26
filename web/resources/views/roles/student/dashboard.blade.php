@@ -31,6 +31,7 @@
                 >
                     View Schedule
                 </button>
+
             </div>
         </div>
     </div>
@@ -84,7 +85,7 @@
                             <p class="font-medium text-slate-700 dark:text-navy-100">
                                 Current Semester
                             </p>
-                            <p class="text-right">Btech S4</p>
+                            <p class="text-right">{{ Auth::user()->student->currentSemester->semester->name }}</p>
                         </div>
                         <div class="flex justify-between">
                             <p class="font-medium text-slate-700 dark:text-navy-100">
@@ -244,7 +245,7 @@
     {{-- Parents Column --}}
     {{-- Start --}}
     <div class="pt-12 lg:mt-0 col-span-12 lg:col-span-4 xl:col-span-4">
-        <div class="px-6 text-xl text-center font-semibold text-gray-600 mb-8">
+        <div class="px-6 text-xl text-left font-semibold text-gray-600 mb-8">
             Parents
         </div>
     @foreach (Auth::user()->guardians as $parent)

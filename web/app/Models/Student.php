@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Student extends Model
 {
@@ -37,8 +38,8 @@ class Student extends Model
         return $this->hasMany(StudentSemester::class);
     }
 
-    public function currentSemester(): BelongsTo
+    public function currentSemester(): HasOne
     {
-        return $this->belongsTo(StudentSemester::class)->where('is_current', true)->first();
+        return $this->hasOne(StudentSemester::class)->where('is_current', true);
     }
 }
