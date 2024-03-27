@@ -39,4 +39,9 @@ Route::middleware([
     Route::get('/buses', function () {
         return view('roles.admin.manage-bus');
     })->name('admin.manage-bus');
+
+    Route::get('/semesters', function () {
+        $semesters = \App\Models\Semester::all();
+        return view('roles.student.semesters', compact('semesters'));
+    })->name('student.semester');
 });
