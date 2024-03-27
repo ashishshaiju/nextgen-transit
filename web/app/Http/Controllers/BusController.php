@@ -9,6 +9,9 @@ use App\Models\BusBoardingPoint;
 use App\Models\Settings;
 use App\Models\Student;
 use App\Models\User;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 
 class BusController extends Controller
 {
@@ -104,9 +107,24 @@ class BusController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): View|\Illuminate\Foundation\Application|Factory|Application
     {
-        //
+        // get all buses with boarding points.user and driver, also get the student count for each bus
+        $buses = Bus::with(['busBoardingPoints.user', 'driver'])->get();
+
+        // get member count for each bus
+        $buses->map(function ($bus) {
+            $bus->student_count = $bus->busBoardingPoints->sum('student_count');
+            $bus->staff_count = $bus->busBoardingPoints->sum('staff_count');
+            $bus->guardian_count = $bus->busBoardingPoints->sum('guardian_count');
+            $bus->driver_count = $bus->busBoardingPoints->sum('driver_count');
+            $bus->total_people = $bus->busBoardingPoints->sum('total_people');
+            $bus->seats_available = $bus->busBoardingPoints->sum('seats_available');
+            return $bus;
+        });
+
+//        dd($buses->toArray());
+        return view('roles.admin.manage-bus', compact('buses'));
     }
 
     /**

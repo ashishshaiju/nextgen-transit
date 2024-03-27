@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('access_logs', function (Blueprint $table) {
             $table->id();
             $table->string('ip_address', 45);
-            $table->foreignId('bus_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('bus_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
             $table->string('card_token', 255)->nullable();
             $table->enum('status', ['success', 'failed']);
             $table->string('message', 255)->nullable();

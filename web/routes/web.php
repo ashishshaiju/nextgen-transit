@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BusController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -36,12 +37,10 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/buses', function () {
-        return view('roles.admin.manage-bus');
-    })->name('admin.manage-bus');
+    Route::get('/buses', [BusController::class, 'index',])->name('admin.manage-bus');
 
     Route::get('/semesters', function () {
-        // get alll student semesters with student info and semester info for the current authenticated user
+        // get all student semesters with student info and semester info for the current authenticated user
         $semesters = auth()->user()->student->studentSemesters()->with('semester')->get();
         return view('roles.student.semesters', compact('semesters'));
     })->name('student.semester');
