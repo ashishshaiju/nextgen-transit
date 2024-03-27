@@ -41,7 +41,8 @@ Route::middleware([
     })->name('admin.manage-bus');
 
     Route::get('/semesters', function () {
-        $semesters = \App\Models\Semester::all();
+        // get alll student semesters with student info and semester info for the current authenticated user
+        $semesters = auth()->user()->student->studentSemesters()->with('semester')->get();
         return view('roles.student.semesters', compact('semesters'));
     })->name('student.semester');
 });
