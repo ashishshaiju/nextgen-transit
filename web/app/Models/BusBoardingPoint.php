@@ -47,7 +47,7 @@ class BusBoardingPoint extends Model
 
     public function getGuardianCountAttribute()
     {
-        return $this->user()->role('parent')->count();
+        return $this->user()->role('student')->with('guardians')->get()->pluck('guardians')->flatten()->count();
     }
 
     public function getStaffCountAttribute()
