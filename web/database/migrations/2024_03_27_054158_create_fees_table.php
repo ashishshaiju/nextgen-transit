@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('fees', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('student_semester_id')->constrained()->onDelete('cascade');
+            $table->decimal('due_amount', 10, 2);
+            $table->date('due_date');
             $table->timestamps();
         });
     }
