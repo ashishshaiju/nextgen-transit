@@ -17,7 +17,9 @@ class FeeFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'student_semester_id' => \App\Models\StudentSemester::factory(),
+            'due_amount' => $this->faker->randomFloat(2, 0, 10000),
+            'due_date' => $this->faker->date(),
         ];
     }
 }
