@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AccessLog;
 use App\Models\Bus;
 use App\Http\Requests\StoreBusRequest;
 use App\Http\Requests\UpdateBusRequest;
@@ -31,9 +32,20 @@ class BusController extends Controller
         $busId = request()->bus_id;
         $cardToken = request()->card_token;
 
+        // create a new access log
+        $accessLog = new AccessLog();
+        $accessLog->bus_id = $busId;
+        $accessLog->card_token = $cardToken;
+        $accessLog->ip_address = request()->ip();
+
         // check if the bus exists
         $bus = Bus::find($busId);
         if (!$bus) {
+            $accessLog->status = 'failed';
+            $accessLog->message = 'Bus not found';
+            $accessLog->action = 'CBMS Machine';
+            $accessLog->type = 'in';
+            $accessLog->save();
             return response()->json(['message' => 'Bus not found'], 404);
         }
 
@@ -48,12 +60,23 @@ class BusController extends Controller
                 // check if the card exists
                 $user = User::where('card_token', $cardToken)->first();
                 if ($user) {
+                    $accessLog->status = 'failed';
+                    $accessLog->message = 'Card already assigned';
+                    $accessLog->action = 'Assigner';
+                    $accessLog->type = 'non';
+                    $accessLog->save();
                     return response()->json(['message' => 'Card already assigned'], 400);
                 }
 
                 // check if the student exists
                 $student = Student::find($assignerModeData->student_id);
                 if (!$student) {
+                    $accessLog->status = 'failed';
+                    $accessLog->message = 'Student not found';
+                    $accessLog->user_id = $assignerModeData->student_id;
+                    $accessLog->action = 'Assigner';
+                    $accessLog->type = 'non';
+                    $accessLog->save();
                     return response()->json(['message' => 'Student not found'], 404);
                 }
 
@@ -62,7 +85,12 @@ class BusController extends Controller
                 $student->user->save();
 
                 // record the activity
-                // TODO: record the activity
+                $accessLog->status = 'success';
+                $accessLog->message = 'Card assigned successfully';
+                $accessLog->action = 'Assigner';
+                $accessLog->type = 'non';
+                $accessLog->user_id = $student->user_id;
+                $accessLog->save();
 
                 // reset the assigner mode
                 $assignerMode->is_active = false;
@@ -82,21 +110,35 @@ class BusController extends Controller
 
         // check if the user exists
         if (!$user) {
-            return response()->json(['message' => 'Card not found'], 404);
+            $accessLog->status = 'failed';
+            $accessLog->message = 'Card not found';
+            $accessLog->action = 'CBMS Machine';
+            $accessLog->type = 'in';
+            $accessLog->save();
+            return response()->json(['message' => 'Card not assigned'], 404);
         }
 
         $student = $user->student;
 
         // check if the bus is assigned to the student who is using the card
         if ($user->busBoardingPoint->bus_id != $busId) {
-            return response()->json(['message' => 'Card not assigned to the bus'], 400);
+            $accessLog->status = 'failed';
+            $accessLog->message = 'Card not assigned due to bus mismatch';
+            $accessLog->action = 'CBMS Machine';
+            $accessLog->type = 'in';
+            return response()->json(['message' => 'Card not assigned due to bus mismatch'], 400);
         }
 
         // check the fee status of the student
         // TODO: check the fee status of the student
 
         // record the activity
-        // TODO: record the activity
+        $accessLog->status = 'success';
+        $accessLog->message = 'Card validated successfully';
+        $accessLog->action = 'CBMS Machine';
+        $accessLog->type = 'in';
+        $accessLog->user_id = $user->id;
+        $accessLog->save();
 
         // return the response to the cbms machine
         return response()->json(['message' => 'Card validated successfully'], 200);
@@ -123,7 +165,6 @@ class BusController extends Controller
             return $bus;
         });
 
-//        dd($buses->toArray());
         return view('roles.admin.manage-bus', compact('buses'));
     }
 

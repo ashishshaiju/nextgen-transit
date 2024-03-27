@@ -20,7 +20,7 @@ return new class extends Migration
             $table->enum('status', ['success', 'failed']);
             $table->string('message', 255)->nullable();
             $table->string('action', 255);
-            $table->enum('type', ['in', 'out']);
+            $table->enum('type', ['in', 'out', 'non'])->nullable();
             $table->timestamps();
         });
     }

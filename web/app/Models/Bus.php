@@ -35,4 +35,10 @@ class Bus extends Model
     {
         return $this->hasMany(Driver::class);
     }
+
+    // access logs for the bus
+    public function accessLogs(): HasMany
+    {
+        return $this->hasMany(AccessLog::class);
+    }
 }
