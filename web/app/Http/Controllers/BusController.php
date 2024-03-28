@@ -152,7 +152,7 @@ class BusController extends Controller
     public function index(): View|\Illuminate\Foundation\Application|Factory|Application
     {
         // get all buses with boarding points.user and driver, also get the student count for each bus
-        $buses = Bus::with(['busBoardingPoints.user', 'driver'])->get();
+        $buses = Bus::with(['busBoardingPoints.user', 'driver'])->paginate(10);
 
         // get member count for each bus
         $buses->map(function ($bus) {
