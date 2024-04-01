@@ -73,7 +73,7 @@
                                             <th scope="col" class="px-6 py-3 text-start">
                                                 <div class="flex items-center gap-x-2">
                     <span class="text-xs font-semibold uppercase tracking-wide text-gray-800">
-                      API Key
+                      On Board
                     </span>
                                                 </div>
                                             </th>
@@ -81,7 +81,7 @@
                                             <th scope="col" class="px-6 py-3 text-start">
                                                 <div class="flex items-center gap-x-2">
                     <span class="text-xs font-semibold uppercase tracking-wide text-gray-800">
-                      Status
+                      Seat Availability
                     </span>
                                                 </div>
                                             </th>
@@ -89,7 +89,7 @@
                                             <th scope="col" class="px-6 py-3 text-start">
                                                 <div class="flex items-center gap-x-2">
                     <span class="text-xs font-semibold uppercase tracking-wide text-gray-800">
-                      Created
+                      Last Activity
                     </span>
                                                 </div>
                                             </th>
@@ -99,7 +99,7 @@
                                         </thead>
 
                                         <tbody class="divide-y divide-gray-200">
-                                        @forelse(\App\Models\Bus::with(['driver.user'])->latest()->get() as $bus)
+                                        @forelse($buses as $bus)
                                         <tr>
                                             <td class="size-px whitespace-nowrap">
                                                 <div class="ps-6 py-3">
@@ -116,7 +116,7 @@
                                                         {{ $bus->name }}
 
                                                         <span class="float-right py-1 px-1.5 inline-flex items-center gap-x-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-                                                            {{ $bus->bus_no }}
+                                                            Bus No : {{ $bus->bus_no }}
                                                         </span>
                                                     </span>
                                                 </div>
@@ -143,52 +143,66 @@
                                             <td class="size-px whitespace-nowrap">
                                                 <div class="px-6 py-3">
                                                     <span class="float-left py-1 px-1.5 inline-flex items-center gap-x-1 text-xs font-medium bg-orange-100 text-orange-800 rounded-full">
-                                                        Students : {{ $bus->bus_no }}
+                                                        Students : {{ $bus->student_count }}
                                                     </span>
                                                     <span class="float-left py-1 my-1 px-1.5 inline-flex items-center gap-x-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-                                                        Staff : {{ $bus->bus_no }}
+                                                        Staff : {{ $bus->staff_count }}
                                                     </span>
                                                     <span class="float-left py-1 my-1 px-1.5 inline-flex items-center gap-x-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-                                                        Parents : {{ $bus->bus_no }}
+                                                        Parents : {{ $bus->guardian_count }}
                                                     </span>
                                                 </div>
                                             </td>
                                             <td class="size-px whitespace-nowrap">
                                                 <div class="px-6 py-3">
-                    <span class="py-1 px-1.5 inline-flex items-center gap-x-1 text-xs font-medium bg-teal-100 text-teal-800 rounded-full">
-                      <svg class="size-2.5" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-                      </svg>
-                      Successful
+                                                    @if($bus->busBoardingPoints->count() > 0)
+                                                        <span class="py-1 px-1.5 inline-flex items-center gap-x-1 text-sm font-medium bg-teal-100 text-teal-800 rounded-full">
+                        <svg class="size-2.5" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                        </svg>
+                        {{ $bus->seats_available }} / {{ $bus->capacity }} Seats left
                     </span>
+                                                    @else
+                                                        <span class="py-1 px-1.5 inline-flex items-center gap-x-1 text-sm font-medium bg-red-100 text-red-800 rounded-full">
+                        <svg class="size-2.5" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                        </svg>
+                        Bus Not Yet Assigned
+                    </span>
+                                                        @endif
                                                 </div>
                                             </td>
                                             <td class="size-px whitespace-nowrap">
                                                 <div class="px-6 py-3">
-                                                    <span class="text-sm text-gray-600">28 Dec, 12:12</span>
+                                                    <span class="text-sm text-gray-600">
+                                                        {{ $bus->updated_at->diffForHumans() }}
+                                                    </span>
                                                 </div>
                                             </td>
                                             <td class="size-px whitespace-nowrap">
                                                 <div class="px-6 py-1.5">
                                                     <div class="hs-dropdown relative inline-block [--placement:bottom-right]">
-                                                        <button id="hs-table-dropdown-1" type="button" class="hs-dropdown-toggle py-1.5 px-2 inline-flex justify-center items-center gap-2 rounded-lg text-gray-700 align-middle disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-blue-600 transition-all text-sm dark:text-gray-400 dark:hover:text-white dark:focus:ring-offset-gray-800">
+                                                        <button id="hs-table-dropdown-1" type="button" class="hs-dropdown-toggle py-1.5 px-2 inline-flex justify-center items-center gap-2 rounded-lg text-gray-700 align-middle disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-blue-600 transition-all text-sm">
                                                             <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
                                                         </button>
                                                         <div class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden divide-y divide-gray-200 min-w-40 z-10 bg-white shadow-2xl rounded-lg p-2 mt-2" aria-labelledby="hs-table-dropdown-1">
                                                             <div class="py-2 first:pt-0 last:pb-0">
-                                                                <a class="flex items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-blue-500" href="#">
-                                                                    Staffs
+                                                                <a class="flex items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-blue-500" href="{{ route('admin.manage-bus.access-logs', ['bus' => $bus->id]) }}">
+                                                                    Access Logs
                                                                 </a>
                                                                 <a class="flex items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-blue-500" href="#">
-                                                                    Students
+                                                                    Staffs (wip)
                                                                 </a>
                                                                 <a class="flex items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-blue-500" href="#">
-                                                                    Edit
+                                                                    Students (wip)
+                                                                </a>
+                                                                <a class="flex items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-blue-500" href="#">
+                                                                    Edit (wip)
                                                                 </a>
                                                             </div>
                                                             <div class="py-2 first:pt-0 last:pb-0">
                                                                 <a class="flex items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-red-600 hover:bg-gray-100 focus:ring-2 focus:ring-blue-500" href="#">
-                                                                    Delete
+                                                                    Delete (wip)
                                                                 </a>
                                                             </div>
                                                         </div>
@@ -199,7 +213,7 @@
                                         @empty
 <tr>
                                                 <td class="px-6 py-4 whitespace-nowrap" colspan="7">
-                                                    <div class="text-sm text-gray-500">
+                                                    <div class="text-sm text-center text-gray-500">
                                                         No buses found.
                                                     </div>
                                                 </td>
@@ -213,21 +227,23 @@
                                     <div class="px-6 py-4 grid gap-3 md:flex md:justify-between md:items-center border-t border-gray-200">
                                         <div>
                                             <p class="text-sm text-gray-600 ">
-                                                <span class="font-semibold text-gray-800">6</span> results
+                                                <span class="font-semibold text-gray-800">
+                                                    {{ $buses->firstItem() }}-{{ $buses->lastItem() }}
+                                                </span> results
                                             </p>
                                         </div>
 
                                         <div>
                                             <div class="inline-flex gap-x-2">
-                                                <button type="button" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+                                               <a href="{{ $buses->previousPageUrl() }}" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
                                                     <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                                                    Prev
-                                                </button>
+                                                    Previous
+                                                </a>
 
-                                                <button type="button" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
+                                                <a href="{{ $buses->nextPageUrl() }}" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none">
                                                     Next
-                                                    <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-                                                </button>
+                                                    <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>

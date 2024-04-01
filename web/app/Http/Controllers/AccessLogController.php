@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AccessLog;
 use App\Http\Requests\StoreAccessLogRequest;
 use App\Http\Requests\UpdateAccessLogRequest;
+use App\Models\Bus;
 
 class AccessLogController extends Controller
 {
@@ -35,9 +36,18 @@ class AccessLogController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(AccessLog $accessLog)
+    public function busShow(AccessLog $accessLog, Bus $bus)
     {
-        //
+
+        // check if the authenticated user is authorized to view the bus
+        if (!auth()->user()->hasRole('admin')) {
+            abort(403);
+        }
+
+        // Access Logs for a specific bus
+        $accessLogs = $bus->accessLogs()->latest()->paginate(10);
+
+        return view('roles.admin.access-logs', compact('accessLogs', 'bus'));
     }
 
     /**

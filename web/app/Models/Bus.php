@@ -26,8 +26,19 @@ class Bus extends Model
         return $this->hasMany(BusBoardingPoint::class);
     }
 
+    public function students(): BelongsToMany
+    {
+        return $this->belongsToMany(Student::class);
+    }
+
     public function driver(): hasMany
     {
         return $this->hasMany(Driver::class);
+    }
+
+    // access logs for the bus
+    public function accessLogs(): HasMany
+    {
+        return $this->hasMany(AccessLog::class);
     }
 }

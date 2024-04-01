@@ -31,33 +31,4 @@ class AccessLog extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function getActionAttribute($value): string
-    {
-        return ucfirst($value);
-    }
-
-    public function setActionAttribute($value): void
-    {
-        $this->attributes['action'] = strtolower($value);
-    }
-
-    public function getStatusAttribute($value): string
-    {
-        return ucfirst($value);
-    }
-
-    public function setStatusAttribute($value): void
-    {
-        $this->attributes['status'] = strtolower($value);
-    }
-
-    public function getTypeAttribute($value): string
-    {
-        return ucfirst($value);
-    }
-
-    public function setTypeAttribute($value): void
-    {
-        $this->attributes['type'] = strtolower($value);
-    }
 }

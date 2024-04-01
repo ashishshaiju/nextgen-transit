@@ -90,6 +90,7 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Jane Doe',
                 'email' => 'staff1@gmail.com',
                 'password' => bcrypt('password'),
+                'bus_boarding_point_id' => $busBoardingPoint->id,
             ])->id,
         ]);
 

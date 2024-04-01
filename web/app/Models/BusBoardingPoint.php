@@ -34,4 +34,36 @@ class BusBoardingPoint extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    public function getStudentCountAttribute()
+    {
+        return $this->user()->role('student')->count();
+    }
+
+    public function getDriverCountAttribute()
+    {
+        return $this->user()->role('driver')->count();
+    }
+
+    public function getGuardianCountAttribute()
+    {
+        return $this->user()->role('student')->with('guardians')->get()->pluck('guardians')->flatten()->count();
+    }
+
+    public function getStaffCountAttribute()
+    {
+        return $this->user()->role('staff')->count();
+    }
+
+    // get the total number of people in the bus
+    public function getTotalPeopleAttribute()
+    {
+        return $this->user()->count();
+    }
+
+    // get seats available in the bus
+    public function getSeatsAvailableAttribute()
+    {
+        return $this->bus->capacity - $this->user()->count();
+    }
 }
