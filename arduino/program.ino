@@ -1,204 +1,340 @@
-#define TINY_GSM_MODEM_SIM800  // Define GSM modem model
-#include <SoftwareSerial.h>
-#include <TinyGsmClient.h>
-#include <Wire.h>
-#include <LiquidCrystal_I2C.h>
+#include <WiFi.h>
+#include <HTTPClient.h>
 #include <SPI.h>
 #include <MFRC522.h>
-#include <toneAC.h>
+#include <TinyGPSPlus.h>
+#include <LiquidCrystal_I2C.h>
+#include <Wire.h>
 
-// I2C address for the LCD
-#define I2C_ADDR 0x27
+// ===== WiFi Settings =====
+const char* ssid = "Asdf";            // Replace with your WiFi SSID
+const char* password = "1212121212";  // Replace with your WiFi Password
 
-// Define the LCD display
-LiquidCrystal_I2C lcd(I2C_ADDR, 16, 2);
+// ===== Server Endpoints (Mock URLs) =====
+const char* gpsServerURL = "https://cbms.hostfree.co/api/updateCoordinates";
+const char* rfidServerURL = "https://cbms.hostfree.co/api/c";
 
-String apn = "internet";                    // APN
-String apn_u = "";                         // APN-Username
-String apn_p = "";                         // APN-Password
-String url = "http://buspass.albinvar.in"; // URL of Server
+// ===== 16x2 LCD Display Settings =====
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-SoftwareSerial SWserial(2, 3); // RX, TX
+// ===== Custom I2C Pins for LCD =====
+#define I2C_SDA 26  // Use GPIO26 for SDA
+#define I2C_SCL 27  // Use GPIO27 for SCL
 
-MFRC522 mfrc522(10, 9);  // Define RFID reader pins (SS, RST)
+// ===== Buzzer & LED Settings =====
+#define BUZZER_PIN 32
+#define RED_LED_PIN 33
+#define GREEN_LED_PIN 25
+
+// ===== RC522 RFID Module Settings =====
+#define RST_PIN 22  // Reset pin for RC522
+#define SS_PIN 5    // Slave Select (SDA) pin for RC522
+MFRC522 mfrc522(SS_PIN, RST_PIN);
+
+// ===== GPS Module Settings =====
+// Using HardwareSerial (UART2) for GPS. Connect GPS TX to ESP32 GPIO4.
+HardwareSerial gpsSerial(2);
+const uint32_t GPSBaud = 9600;  // Typical baud rate for Neo-6M
+TinyGPSPlus gps;
+
+// Global variables for GPS data
+double currentLat = 0.0;
+double currentLng = 0.0;
+bool fixAvailable = false;
+
+// Global variables for RFID display (to show RFID and displaying error for a short period)
+String lastRFID = "";
+unsigned long lastRFIDTime = 0;  // Time when RFID was last updated
+String cardStatus = "";          // To store "Invalid User" or "User Valid"
+
+// Timing variables for sending GPS data every 10 seconds
+unsigned long previousGpsMillis = 0;
+const long gpsInterval = 30000;  // 30 seconds
+
+// Timing variables for updating LCD display
+unsigned long lastLCDUpdate = 0;
+const unsigned long lcdUpdateRate = 4000;  // Update every 4 seconds
+
+// ===== Beep Notification Function =====
+void buzzer(int n, bool initialBeep = false) {
+  digitalWrite(RED_LED_PIN, HIGH);  // Turn Red LED on
+  if (initialBeep) {
+    // Short single beep for detection
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(50);  // Short 50ms beep
+    digitalWrite(BUZZER_PIN, LOW);
+  } else {
+    Serial.println("Inside Buzzer else function");
+    // Validation beeps
+    for (int i = 1; i <= n; i++) {
+      // tone(BUZZER_PIN, 1400);  // Use your loudest frequency (e.g., 2700 Hz)
+      digitalWrite(BUZZER_PIN, HIGH);
+      if (n > 1) {
+        delay(50);  // Short beep for multiple
+      } else {
+        delay(100);  // Longer beep for single
+      }
+      // noTone(BUZZER_PIN);
+      digitalWrite(BUZZER_PIN, LOW);
+      if (n > 1) {
+        delay(150);  // Pause between beeps
+      }
+    }
+    // Blink LCD backlight 4 times (2 seconds total)
+    for (int i = 0; i < 4; i++) {
+      lcd.noBacklight();
+      delay(250);
+      lcd.backlight();
+      delay(250);
+    }
+  }
+  digitalWrite(RED_LED_PIN, LOW);  // Turn LED off
+}
+
+// ===== Display Update Function =====
+// This function mimics the display logic of the provided code sample.
+// It shows branding + WiFi status on line 1 and dynamic data on line 2.
+void updateLCD() {
+  lcd.clear();
+
+  // If an RFID card was scanned within the last 5 seconds, show its status on line 1 only
+  if (lastRFID != "" && (millis() - lastRFIDTime < 5000)) {
+    String statusMsg = cardStatus;  // "Invalid User" or "User Valid", "Error", etc.
+    if (statusMsg.length() > 16) {
+      statusMsg = statusMsg.substring(0, 16);
+    }
+    lcd.setCursor(0, 0);
+    lcd.print(statusMsg);
+  } else {
+    // Turn off green LED when RFID status is no longer displayed
+    digitalWrite(GREEN_LED_PIN, LOW);
+
+    // Line 1: Branding and WiFi status
+    String line1 = "BusTracker ";
+    if (WiFi.status() == WL_CONNECTED) {
+      line1 += "WiFi";
+    } else {
+      line1 += "NoWiFi";
+    }
+    // Ensure we don't exceed 16 characters
+    if (line1.length() > 16) {
+      line1 = line1.substring(0, 16);
+    }
+    lcd.setCursor(0, 0);
+    lcd.print(line1);
+
+    // Line 2: If an RFID card was scanned within the last 5 seconds, show its status;
+    // otherwise, show GPS info.
+    lcd.setCursor(0, 1);
+    if (fixAvailable) {
+      // Display GPS latitude (truncated to 2 decimals) for brevity
+      String gpsMsg = "Lat:" + String(currentLat, 2);
+      if (gpsMsg.length() > 16) {
+        gpsMsg = gpsMsg.substring(0, 16);
+      }
+      lcd.print(gpsMsg);
+    } else {
+      lcd.print("No GPS fix");
+    }
+  }
+}
 
 void setup() {
+
+  // Initialize and set Buzzer & LED
+  pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(RED_LED_PIN, OUTPUT);
+  pinMode(GREEN_LED_PIN, OUTPUT);
+  digitalWrite(RED_LED_PIN, LOW);
+  digitalWrite(GREEN_LED_PIN, LOW);
+
   Serial.begin(115200);
-  Serial.println("SIM800 AT CMD Test");
-  SWserial.begin(9600);
+  delay(1000);
 
-  // Initialize the LCD
-  lcd.begin(16, 2);
+  // Initialize LCD
+  Wire.begin(I2C_SDA, I2C_SCL);
+  lcd.init();
   lcd.backlight();
-
-  // Initialize the RFID reader
-  SPI.begin();
-  mfrc522.PCD_Init();
-
-  // Display Intro Message
-  lcd.setCursor(0, 0);
-  lcd.print("CBPVM System");
-
-  delay(2000);
-  // Display a cheerful message
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("Setting up GSM..");
-  delay(2000);
-  // Display a cheerful message
-  lcd.setCursor(0, 0);
-  lcd.print("Configuring GPRS...");
+  lcd.print("System Starting");
 
-  delay(15000);
-  while (SWserial.available()) {
-    Serial.write(SWserial.read());
+  Serial.println("ESP32 Bus Tracking & Fee Payment System Starting...");
+
+  // Connect to WiFi
+  lcd.setCursor(0, 1);
+  lcd.print("Connecting WiFi");
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting to WiFi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
   }
-  delay(2000);
-  gsmConfigGPRS();
-  lcd.setCursor(0, 1);
-  lcd.print("Success...!!!");
+  Serial.println();
+  Serial.print("Connected! IP: ");
+  Serial.println(WiFi.localIP());
 
-  delay(2000);
-
-  //clear the screen
+  // Show WiFi connection on LCD and beep
   lcd.clear();
-
   lcd.setCursor(0, 0);
-  lcd.print("Please scan your");
+  lcd.print("WiFi Connected");
   lcd.setCursor(0, 1);
-  lcd.print("card here...");
+  lcd.print(WiFi.localIP());
+  buzzer(1);  // Single beep on startup
+  delay(1000);
+
+  // Initialize RC522 RFID reader
+  SPI.begin();  // Uses default SPI pins: SCK=GPIO18, MISO=GPIO19, MOSI=GPIO23
+  mfrc522.PCD_Init();
+  Serial.println("RC522 RFID reader initialized.");
+
+  // Initialize GPS module using HardwareSerial on UART2
+  // GPS TX is connected to ESP32 GPIO4; unused TX parameter set to -1.
+  gpsSerial.begin(GPSBaud, SERIAL_8N1, 4, -1);
+  Serial.println("GPS module initialized on UART2 (RX pin: 4).");
+
+  // Final initialization message on LCD
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Init Complete");
+  delay(1000);
+  lcd.clear();
+  lastLCDUpdate = millis();
 }
 
 void loop() {
-
-  if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
-    tone(7, 1000, 250);  
-    // Read RFID card UID
-    String uid = "";
-    for (byte i = 0; i < mfrc522.uid.size; i++) {
-      uid += String(mfrc522.uid.uidByte[i], HEX);
+  // Process incoming GPS data
+  while (gpsSerial.available() > 0) {
+    char c = gpsSerial.read();
+    gps.encode(c);
+    if (gps.location.isUpdated()) {
+      currentLat = gps.location.lat();
+      currentLng = gps.location.lng();
+      fixAvailable = true;
     }
-    // Make HTTP request with UID as a parameter
-    gsmHTTPPost("uid=" + uid);
-    delay(1000);  // Adjust delay based on your requirements
-    lcd.setCursor(0, 0);
-    lcd.print("Please scan your");
-    lcd.setCursor(0, 1);
-    lcd.print("card here...");
-    mfrc522.PICC_HaltA();
-    mfrc522.PCD_StopCrypto1();
+  }
+
+  // Periodically send GPS data every 30 seconds
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousGpsMillis >= gpsInterval) {
+    previousGpsMillis = currentMillis;
+    sendGPSData();
+  }
+
+  // Check for RFID card detection
+  if (mfrc522.PICC_IsNewCardPresent()) {
+    if (mfrc522.PICC_ReadCardSerial()) {
+      String rfidUID = "";
+      for (byte i = 0; i < mfrc522.uid.size; i++) {
+        rfidUID += (mfrc522.uid.uidByte[i] < 0x10 ? "0" : "");
+        rfidUID += String(mfrc522.uid.uidByte[i], HEX);
+      }
+      rfidUID.toUpperCase();
+      Serial.print("RFID Card detected, UID: ");
+      Serial.println(rfidUID);
+
+      // Immediate feedback: Short beep and red LED flash to confirm card read
+      buzzer(1, true);  // Single short beep for detection
+
+      // Save RFID info globally so updateLCD() can display it for 5 seconds
+      lastRFID = rfidUID;
+      lastRFIDTime = millis();
+      sendRFIDData(rfidUID);
+
+      // Halt the card to allow new scans
+      mfrc522.PICC_HaltA();
+    }
+  }
+
+  // Update the LCD every lcdUpdateRate milliseconds
+  if (millis() - lastLCDUpdate >= lcdUpdateRate) {
+    updateLCD();
+    lastLCDUpdate = millis();
   }
 }
 
-void gsmHTTPPost(String postdata) {
-  //clear the screen
-  lcd.clear();
+// ===== Function to Send GPS Data =====
+void sendGPSData() {
+  if (fixAvailable) {
+    Serial.print("Sending GPS -> Lat: ");
+    Serial.print(currentLat, 6);
+    Serial.print(" Lng: ");
+    Serial.println(currentLng, 6);
 
-  lcd.setCursor(0, 0);
-  lcd.print("Please wait...");
+    // Create JSON payload
+    String payload = "{\"latitude\":" + String(currentLat, 6) + ",\"longitude\":" + String(currentLng, 6) + "}";
 
-  Serial.println(" --- Start GPRS & HTTP --- ");
-  gsmSendSerial("AT+SAPBR=1,1");
-  gsmSendSerial("AT+SAPBR=2,1");
-  gsmSendSerial("AT+HTTPINIT");
-  gsmSendSerial("AT+HTTPPARA=CID,1");
-  gsmSendSerial("AT+HTTPPARA=URL," + url);
-  gsmSendSerial("AT+HTTPPARA=CONTENT,application/x-www-form-urlencoded");
-  gsmSendSerial("AT+HTTPDATA=100,1000");
- 
-  lcd.setCursor(0, 0);
-  lcd.print("Sending Request..");
-  gsmSendSerial("AT+HTTPACTION=1");
-  lcd.setCursor(0, 1);
-  lcd.print("Done..!!!");
-  delay(7000);  // Wait for HTTP response
-  // Read HTTP status code
-  String response = gsmReadResponse();
-  int statusCode = response.substring(response.indexOf(",") + 1).toInt();
+    // Turn off green LED at the start of a new scan
+    digitalWrite(GREEN_LED_PIN, LOW);
 
-  if (statusCode == 200) {
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("Verified...!!!");
+    if (WiFi.status() == WL_CONNECTED) {
+      HTTPClient http;
+      http.begin(gpsServerURL);
+      http.addHeader("Content-Type", "application/json");
+      int httpResponseCode = http.POST(payload);
+      if (httpResponseCode > 0) {
+        Serial.print("GPS POST Response: ");
+        Serial.println(httpResponseCode);
+        String response = http.getString();
+        Serial.println("Response: " + response);
+      } else {
+        Serial.print("Error sending GPS: ");
+        Serial.println(http.errorToString(httpResponseCode).c_str());
+      }
+      http.end();
     } else {
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("Unauthorized...!!!");
+      Serial.println("WiFi not connected.");
     }
-
-  Serial.println("HTTP Status Code: " + String(statusCode));
-  // Read and print HTTP response
-  delay(5000);
-  response = gsmReadApiResponse();  // Read the actual HTTP response
-
-  Serial.println("HTTP Response:");
-  Serial.println(response);
-
-  // Extract the JSON part and store it in a variable
-  int jsonStart = response.indexOf("{");
-  int jsonEnd = response.lastIndexOf("}");
-
-  String jsonResponse = response.substring(jsonStart, jsonEnd + 1);
-  Serial.println("Extracted JSON Response:");
-  Serial.println(jsonResponse);
-
-  gsmSendSerial("AT+HTTPTERM");
-  gsmSendSerial("AT+SAPBR=0,1");
-
-  //clear the screen
-  lcd.clear();
-
-  lcd.setCursor(0, 0);
-  lcd.print("Success...!");
-}
-
-
-void gsmConfigGPRS() {
-  Serial.println(" --- CONFIG GPRS --- ");
-  gsmSendSerial("AT+SAPBR=3,1,Contype,GPRS");
-  gsmSendSerial("AT+SAPBR=3,1,APN," + apn);
-  if (apn_u != "") {
-    gsmSendSerial("AT+SAPBR=3,1,USER," + apn_u);
-  }
-  if (apn_p != "") {
-    gsmSendSerial("AT+SAPBR=3,1,PWD," + apn_p);
+  } else {
+    Serial.println("No GPS fix available.");
   }
 }
 
-void gsmSendSerial(String command) {
-  Serial.println("Send ->: " + command);
-  SWserial.println(command);
-  delay(1500); // Adjust delay as needed
-  while (SWserial.available()) {
-    Serial.write(SWserial.read());
-  }
-  Serial.println();
-}
+// ===== Function to Send RFID Data using GET request =====
+void sendRFIDData(String uid) {
+  Serial.print("Sending GET request with bus id 1 and card token: ");
+  Serial.println(uid);
 
-String gsmReadResponse() {
-  String response = "";
- 
-  while (SWserial.available()) {
-    char c = SWserial.read();
-    response += c;
-    delay(10);
-  }
-  return response;
-}
+  // Construct URL with query parameters
+  String url = String(rfidServerURL) + "?b=1&c=" + uid;
 
-String gsmReadApiResponse() {
-  String response = "";
-  Serial.println("Send ->: AT+HTTPREAD");
-  SWserial.println("AT+HTTPREAD");
-  delay(1000); // Adjust delay as needed, increased to 2000 milliseconds
-  while (SWserial.available()) {
-    char c = SWserial.read();
-    response += c;
-    // Check for the presence of "OK" indicating the end of the response
-    if (response.endsWith("OK")) {
-      break;
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    http.begin(url);  // Use the complete URL for the GET request
+    int httpResponseCode = http.GET();
+    if (httpResponseCode > 0) {
+      Serial.print("GET Response code: ");
+      Serial.println(httpResponseCode);
+      String response = http.getString();
+      Serial.println("Response: " + response);
+
+      // Parse JSON-like response
+      if (response.indexOf("Card validated successfully") != -1) {
+        cardStatus = "User Valid";
+        buzzer(1);  // One longer beep for valid
+        digitalWrite(GREEN_LED_PIN, HIGH);
+      } else if (response.indexOf("Card not assigned") != -1) {
+        cardStatus = "Invalid User";
+        buzzer(2);  // Two short beeps for invalid
+      } else {
+        cardStatus = "Error";  // Fallback for unexpected response
+        buzzer(3);             // Three beeps for error
+      }
+
+    } else {
+      Serial.print("Error on GET: ");
+      Serial.println(http.errorToString(httpResponseCode).c_str());
+      cardStatus = "Server Error";
+      buzzer(3);  // Three beeps for server error
     }
-    delay(10);
+    http.end();
+  } else {
+    Serial.println("WiFi not connected.");
+    cardStatus = "No WiFi";
+    buzzer(3);  // Three beeps for no WiFi
   }
-  return response;
+
+  // Immediately update the LCD with the new cardStatus
+  updateLCD();
+  lastLCDUpdate = millis();
 }
